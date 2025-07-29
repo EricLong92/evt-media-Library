@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVT 视频库</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .header { background: #fff; }
+        .logo { height: 48px; margin-right: 20px; }
+        .lists-container { display: flex; gap: 40px; }
+        .list-block { flex: 1; }
+    </style>
+</head>
+<body>  
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo">
+        <div class="center-titles">
+            <h1 class="english-title">EVT Media Library</h1>
+            <h1 class="chinese-title">EVT 媒体库</h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="lists-container">
+            <div class="list-block">
+                <h2>Video List 视频列表</h2>
+                <ul id="videoList"></ul>
+            </div>
+            <div class="list-block">
+                <h2>Image List 图片列表</h2>
+                <ul id="imageList"></ul>
+            </div>
+        </div>
+    </main>
+    <script>
+        // Hiển thị danh sách video
+        fetch('/videos')
+            .then(response => response.json())
+            .then(videos => {
+                const videoList = document.getElementById('videoList');
+                videos.forEach(video => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <video width="220" height="140" controls>
+                            <source src="/videos/${video}" type="video/mp4">
+                        </video>
+                        <div>${video}</div>
+                        <button onclick="playVideo('${video}')">Full Screen</button>
+                    `;
+                    videoList.appendChild(li);
+                });
+            });
+
+        // Hiển thị danh sách ảnh
+        fetch('/images')
+            .then(response => response.json())
+            .then(images => {
+                const imageList = document.getElementById('imageList');
+                images.forEach(image => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <img src="/images/${image}" width="220" height="140" style="cursor:pointer;">
+                        <div>${image}</div>
+                        <button onclick="showImageFull('${image}')">Full Screen</button>
+                    `;
+                    imageList.appendChild(li);
+                });
+            });
+
+        // Hàm mở video full màn hình và lặp lại
+        function playVideo(videoName) {
+            const videoElement = document.createElement('video');
+            videoElement.src = '/videos/' + videoName;
+            videoElement.controls = true;
+            videoElement.style.position = 'fixed';
+            videoElement.style.top = '0';
+            videoElement.style.left = '0';
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            videoElement.style.zIndex = '1000';
+            videoElement.autoplay = true;
+            videoElement.loop = true;
+            videoElement.addEventListener('loadedmetadata', function() {
+                if (videoElement.requestFullscreen) {
+                    videoElement.requestFullscreen();
+                }
+                videoElement.play();
+            });
+            const closeBtn = document.createElement('button');
+            closeBtn.innerText = 'Đóng';
+            closeBtn.style.position = 'fixed';
+            closeBtn.style.top = '10px';
+            closeBtn.style.right = '10px';
+            closeBtn.style.zIndex = '1001';
+            closeBtn.onclick = function() {
+                document.body.removeChild(videoElement);
+                document.body.removeChild(closeBtn);
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                }
+            };
+            document.body.appendChild(videoElement);
+            document.body.appendChild(closeBtn);
+        }
+
+        // Hàm mở ảnh full màn hình
+        function showImageFull(imageName) {
+            const imgElement = document.createElement('img');
+            imgElement.src = '/images/' + imageName;
+            imgElement.style.position = 'fixed';
+            imgElement.style.top = '0';
+            imgElement.style.left = '0';
+            imgElement.style.width = '100%';
+            imgElement.style.height = '100%';
+            imgElement.style.objectFit = 'contain';
+            imgElement.style.zIndex = '1000';
+            imgElement.addEventListener('load', function() {
+                if (imgElement.requestFullscreen) {
+                    imgElement.requestFullscreen();
+                }
+            });
+            const closeBtn = document.createElement('button');
+            closeBtn.innerText = 'Đóng';
+            closeBtn.style.position = 'fixed';
+            closeBtn.style.top = '10px';
+            closeBtn.style.right = '10px';
+            closeBtn.style.zIndex = '1001';
+            closeBtn.onclick = function() {
+                document.body.removeChild(imgElement);
+                document.body.removeChild(closeBtn);
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                }
+            };
+            document.body.appendChild(imgElement);
+            document.body.appendChild(closeBtn);
+        }
+    </script>
+</body>
+</html>

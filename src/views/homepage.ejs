@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Web App</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Available Videos</h1>
+        <a href="/upload" class="upload-button">Upload Video</a>
+    </header>
+    <main>
+        <h2>Available Videos</h2>
+        <ul id="video-list">
+            <% videos.forEach(function(video) { %>
+                <li>
+                    <video width="320" height="240" controls>
+                        <source src="/videos/<%= video %>" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div><%= video %></div>
+                    <button onclick="playVideo('<%= video %>')">Full Screen</button>
+                </li>
+            <% }); %>
+        </ul>
+        <h2>Available Images</h2>
+        <ul id="image-list">
+            <% images.forEach(function(image) { %>
+                <li>
+                    <img src="/images/<%= image %>" width="320" height="240" style="cursor:pointer;">
+                    <div><%= image %></div>
+                    <button onclick="showImageFull('<%= image %>')">Full Screen</button>
+                </li>
+                
+            <% }); %>
+        </ul>
+    </main>
+    <script>
+        function playVideo(videoName) {
+            const videoElement = document.createElement('video');
+            videoElement.src = '/videos/' + videoName;
+            videoElement.controls = true;
+            videoElement.style.position = 'fixed';
+            videoElement.style.top = '0';
+            videoElement.style.left = '0';
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            videoElement.style.zIndex = '1000';
+            videoElement.autoplay = true;
+            videoElement.loop = true; // Lặp lại video mãi mãi
+
+            // Thử mở toàn màn hình khi video được thêm vào DOM
+            videoElement.addEventListener('loadedmetadata', function() {
+                if (videoElement.requestFullscreen) {
+                    videoElement.requestFullscreen();
+                } else if (videoElement.webkitRequestFullscreen) { // Safari
+                    videoElement.webkitRequestFullscreen();
+                } else if (videoElement.msRequestFullscreen) { // IE11
+                    videoElement.msRequestFullscreen();
+                }
+                videoElement.play();
+            });
+
+            // Thêm nút đóng video toàn màn hình
+            const closeBtn = document.createElement('button');
+            closeBtn.innerText = 'Đóng';
+            closeBtn.style.position = 'fixed';
+            closeBtn.style.top = '10px';
+            closeBtn.style.right = '10px';
+            closeBtn.style.zIndex = '1001';
+            closeBtn.onclick = function() {
+                document.body.removeChild(videoElement);
+                document.body.removeChild(closeBtn);
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                }
+            };
+
+            document.body.appendChild(videoElement);
+            document.body.appendChild(closeBtn);
+        }
+
+        function showImageFull(imageName) {
+            const imgElement = document.createElement('img');
+            imgElement.src = '/images/' + imageName;
+            imgElement.style.position = 'fixed';
+            imgElement.style.top = '0';
+            imgElement.style.left = '0';
+            imgElement.style.width = '100%';
+            imgElement.style.height = '100%';
+            imgElement.style.objectFit = 'contain';
+            imgElement.style.zIndex = '1000';
+
+            imgElement.addEventListener('load', function() {
+                if (imgElement.requestFullscreen) {
+                    imgElement.requestFullscreen();
+                } else if (imgElement.webkitRequestFullscreen) {
+                    imgElement.webkitRequestFullscreen();
+                } else if (imgElement.msRequestFullscreen) {
+                    imgElement.msRequestFullscreen();
+                }
+            });
+
+            const closeBtn = document.createElement('button');
+            closeBtn.innerText = 'Đóng';
+            closeBtn.style.position = 'fixed';
+            closeBtn.style.top = '10px';
+            closeBtn.style.right = '10px';
+            closeBtn.style.zIndex = '1001';
+            closeBtn.onclick = function() {
+                document.body.removeChild(imgElement);
+                document.body.removeChild(closeBtn);
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                }
+            };
+
+            document.body.appendChild(imgElement);
+            document.body.appendChild(closeBtn);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="upload-container">
+        <div class="upload-block">
+            <h1>Upload Video 上传视频</h1>
+            <form action="/upload/video" method="post" enctype="multipart/form-data">
+                <input type="file" name="video" accept="video/*" required>
+                <button type="submit">Upload Video 上传视频</button>
+            </form>
+            <h2>Video List 视频列表</h2>
+            <ul>
+                <% videos.forEach(function(video) { %>
+                    <li>
+                        <video width="220" height="140" controls>
+                            <source src="/videos/<%= video %>" type="video/mp4">
+                        </video>
+                        <div><%= video %></div>
+                        <button onclick="deleteVideo('<%= video %>', this)">Xoá 删除</button>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+        <div class="upload-block">
+            <h1>Upload Image 上传图片</h1>
+            <form action="/upload/image" method="post" enctype="multipart/form-data">
+                <input type="file" name="image" accept="image/*" required>
+                <button type="submit">Upload Image 上传图片</button>
+            </form>
+            <h2>Image List 图片列表</h2>
+            <ul>
+                <% images.forEach(function(image) { %>
+                    <li>
+                        <img src="/images/<%= image %>" width="220" height="140">
+                        <div><%= image %></div>
+                        <button onclick="deleteImage('<%= image %>', this)">Xoá 删除</button>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+    </div>
+    <script>
+        function deleteVideo(videoName, btn) {
+            if (confirm('Bạn có chắc muốn xoá video này?')) {
+                fetch('/videos/' + encodeURIComponent(videoName), { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            btn.parentElement.remove();
+                        } else {
+                            alert('Xoá thất bại!');
+                        }
+                    });
+            }
+        }
+        function deleteImage(imageName, btn) {
+            if (confirm('Bạn có chắc muốn xoá ảnh này?')) {
+                fetch('/images/' + encodeURIComponent(imageName), { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            btn.parentElement.remove();
+                        } else {
+                            alert('Xoá thất bại!');
+                        }
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
