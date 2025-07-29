@@ -16,4 +16,7 @@ Thumbs.db
 .idea/
 
 videos/*.mp4
+!videos/.gitkeep
+
 images/*.png
+!images/.gitkeep
